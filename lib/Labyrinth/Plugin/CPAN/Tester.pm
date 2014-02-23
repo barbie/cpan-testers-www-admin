@@ -377,6 +377,10 @@ sub Dist {
 
 =over 4
 
+=item CheckLock
+
+Checks whether the specified user account is currently locked.
+
 =item Lock
 
 Tester has just registered on the site, lock the user profile until email is 
@@ -392,6 +396,10 @@ unlock the user profile.
 Tester has submitted an email address used to submit a test report. Save as
 unconfirmed and send email confirmation.
 
+=item Email
+
+Send email to tester to confirm email address.
+
 =item Remove
 
 Remove registered email from this user profile.
@@ -406,9 +414,13 @@ confirmation.
 Tester has confirmed login, mark email as confirmed, and map email to 
 addressid.
 
-=item Email
+=item Verify
 
-Send email to tester to confirm email address.
+Allow admin to verify and confirm a tester's email address.
+
+=item Verified
+
+List verified email addresses for specified tester.
 
 =back
 
