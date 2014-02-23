@@ -2,6 +2,7 @@ Changes for the CPAN Testers Admin website
 ==========================================
 
         - extended allowed password characters.
+        - added missing mailer config.
 
 0.05    2014-01-05
         - prepped for official release.
