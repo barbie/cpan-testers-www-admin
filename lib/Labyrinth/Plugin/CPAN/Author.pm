@@ -412,9 +412,9 @@ sub Mark  {
             $done{user}{$userid} = 1;
 
             # send mail to tester
-            MailSend(   template    => 'mailer/marked.eml',
-                        name        => $name,
-                        email       => $email
+            MailSend(   template        => 'mailer/marked.eml',
+                        name            => $name,
+                        recipient_email => $email
             );
 
             if(!MailSent()) {

@@ -24,6 +24,7 @@ use Labyrinth::Mailer;
 use Labyrinth::MLUtils;
 use Labyrinth::Session;
 use Labyrinth::Support;
+use Labyrinth::Users;
 use Labyrinth::Variables;
 
 use Labyrinth::Plugin::CPAN;
@@ -413,21 +414,48 @@ Send email to tester to confirm email address.
 
 =cut
 
+sub CheckLock {
+    my $userid = $tvars{'loginid'};
+    my @row = $dbi->GetQuery('hash','GetUserByID',$userid);
+    return  if(@row && !$row[0]->{locked});
+
+    Labyrinth::Session::Logout();
+
+    $tvars{redirect} = '';
+    SetCommand('tester-locked');
+}
+
 sub Lock {
     return  unless RealmCheck('public','tester','admin');
-    my $userid = $tvars{'loginid'};
+    my $userid = $cgiparams{'userid'};
     $userid = $tvars{user}{tester}  if($tvars{realm} eq 'admin' && $tvars{user}{tester});
     $dbi->DoQuery('LockUser',$userid);
     $dbi->DoQuery('SetRealm','tester',$userid);
 
-    $tvars{data}{'template'} = 'mailer/confirm.eml';
+    my $user = GetUser($userid);
+
+    $tvars{data}{realname}  = $user->{realname};
+    $tvars{data}{email}     = $user->{email};
+    $tvars{data}{template}  = 'mailer/user-confirm.eml';
 }
 
 sub UnLock {
-    return  unless RealmCheck('tester','admin');
-    my $userid = $tvars{'loginid'};
-    $userid = $tvars{user}{tester}  if($tvars{realm} eq 'admin' && $tvars{user}{tester});
+    return  unless RealmCheck('tester','admin','public');
+    
+    my $email;
+    my ($code,$userid) = split('/',$cgiparams{code});
+
+    if($tvars{realm} eq 'admin' && $tvars{user}{tester}) {
+        $userid = $tvars{user}{tester};
+        $email = $cgiparams{confirm};
+    } else {
+        my @confirm = $dbi->GetQuery('hash','CheckConfirmedCode',$code);
+        return  unless(@confirm && $confirm[0]->{userid} == $userid);
+        $email = $confirm[0]->{email};
+    }
+
     $dbi->DoQuery('UnLockUser',$userid);
+    $dbi->DoQuery('ConfirmedEmail',$userid,$email,$code);
 }
 
 sub Submit {
@@ -435,16 +463,46 @@ sub Submit {
     my $userid = $tvars{'loginid'};
     $userid = $tvars{user}{tester}  if($tvars{realm} eq 'admin' && $tvars{user}{tester});
 
-    my $data = $cgiparams{email} . $$ . time . 'ajfpfgjalkshj';
-    my $code = sha1_hex($data);
-    $dbi->DoQuery('UnConfirmedEmail',$userid,$cgiparams{email},$code);
+    $cgiparams{'userid'} = $userid;
 
-    $tvars{data}{'template'} = 'mailer/signup.eml';
+    $tvars{data}{realname}  = UserName($userid);
+    $tvars{data}{email}     = $cgiparams{email};
+    $tvars{data}{template}  = 'mailer/tester-confirm.eml';
     $tvars{thanks} = 1;
+}
+
+sub Email {
+    return  unless RealmCheck('public','tester','admin');
+
+    my $userid = $cgiparams{userid};
+    my $code;
+
+    my @email = $dbi->GetQuery('hash','CheckConfirmedEmail',$userid,$tvars{data}{'email'});
+    if(@email) {
+        $code = $email[0]->{confirm};
+    } else {
+        my $data = $tvars{data}{'email'} . $$ . time . 'ajfpfgjalkshj';
+        $code = sha1_hex($data);
+        $dbi->DoQuery('UnConfirmedEmail',$userid,$tvars{data}{'email'},$code);
+    }
+
+    MailSend(   template        => $tvars{data}{'template'},
+                name            => $tvars{data}{'realname'},
+                recipient_email => $tvars{data}{'email'},
+                code            => "$code/$userid",
+                webpath         => "$tvars{docroot}$tvars{webpath}",
+                nowrap          => 1
+    );
+
+    if(!MailSent()) {
+        $tvars{errcode} = 'BADMAIL';
+    }
 }
 
 sub Remove {
     return  unless RealmCheck('tester','admin');
+
+    return SetCommand('tester-verify') if($cgiparams{confirm});
 
     my $userid = $tvars{'loginid'};
     $userid = $cgiparams{testerid}  if($tvars{realm} eq 'admin' && $cgiparams{testerid});
@@ -469,38 +527,39 @@ sub Remove {
 }
 
 sub Confirm {
-    return  unless RealmCheck('tester','admin');
-    my $userid = $tvars{'loginid'};
-    $userid = $cgiparams{testerid}  if($tvars{realm} eq 'admin' && $cgiparams{testerid});
-    $userid = $tvars{user}{tester}  if($tvars{realm} eq 'admin' && $tvars{user}{tester});
-    $dbi->DoQuery('ConfirmedEmail',$userid,$cgiparams{email});
+    my ($code,$userid) = split('/',$cgiparams{code});
+
+    my @confirm = $dbi->GetQuery('hash','CheckConfirmedCode',$code);
+    return  unless(@confirm && $confirm[0]->{userid} == $userid);
+    
+    return SetCommand('tester-unconfirmed') unless(@confirm && $confirm[0]->{userid} == $userid);
+
+    $dbi->DoQuery('ConfirmedEmail',$userid,$confirm[0]->{email},$code);
 }
 
 sub Confirmed {
+    return  unless RealmCheck('tester');
+    $dbi->DoQuery('ConfirmedEmail',$tvars{'loginid'},$cgiparams{email},$cgiparams{code});
+}
+
+sub Verify {
+    return  unless RealmCheck('admin');
+    my $userid = $tvars{'loginid'};
+    $userid = $cgiparams{testerid}  if($tvars{realm} eq 'admin' && $cgiparams{testerid});
+    $userid = $tvars{user}{tester}  if($tvars{realm} eq 'admin' && $tvars{user}{tester});
+
+    my @confirm = $dbi->GetQuery('hash','CheckConfirmedEmail',$userid,$cgiparams{confirm});
+    return  unless(@confirm);
+
+    $dbi->DoQuery('ConfirmedEmail',$userid,$cgiparams{confirm},$confirm[0]->{confirm});
+}
+
+sub Verified {
     return  unless RealmCheck('tester','admin');
     my $userid = $tvars{data}{'userid'} || $tvars{'loginid'};
     $userid = $tvars{user}{tester}  if($tvars{realm} eq 'admin' && $tvars{user}{tester});
     my @rows = $dbi->GetQuery('hash','GetTesterAddress',$userid);
     $tvars{data}{confirmed} = \@rows    if(@rows);
-}
-
-sub Email {
-    return  unless RealmCheck('public','tester','admin');
-
-    my $userid = $tvars{'loginid'};
-    my $data = $tvars{data}{'email'} . $$ . time . 'ajfpfgjalkshj';
-    my $code = sha1_hex($data);
-    $dbi->DoQuery('UnConfirmedEmail',$userid,$tvars{data}{'email'},$code);
-
-    MailSend(   template    => $tvars{data}{'template'},
-                name        => $tvars{data}{'realname'},
-                email       => $tvars{data}{'email'},
-                code        => $code
-    );
-
-    if(!MailSent()) {
-        $tvars{errcode} = 'BADMAIL';
-    }
 }
 
 =head2 Admin Interface Methods
