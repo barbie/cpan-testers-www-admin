@@ -552,6 +552,8 @@ sub Confirm {
     $dbi->DoQuery('ConfirmedEmail',$userid,$confirm[0]->{email},$code);
 
     # map emails to addresses
+    my $cpan = Labyrinth::Plugin::CPAN->new();
+    my $dbx  = $cpan->DBX('cpanstats');
     my @rows = $dbx->GetQuery('hash','FindAddresses',$confirm[0]->{email});
     for(@rows) {
         $dbi->DoQuery('MapAddresses',$userid,$_->{addressid});
