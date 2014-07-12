@@ -1,6 +1,7 @@
 Changes for the CPAN Testers Admin website
 ==========================================
 
+0.10    2014-07-12
         - typo in mail templates (thanks to chorny).
         - extract Labyrinth::Plugin::CPAN.
         - upgrade to Labyrinth-5.23.
