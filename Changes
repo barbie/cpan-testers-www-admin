@@ -2,6 +2,8 @@ Changes for the CPAN Testers Admin website
 ==========================================
 
         - documentation updates.
+        - upgrade to Labyrinth-5.27.
+        - upgrade to Labyrinth-Plugin-Core-5.18.
 
 0.11    2014-09-20
         - fixed license fields in META.json to be lists.
