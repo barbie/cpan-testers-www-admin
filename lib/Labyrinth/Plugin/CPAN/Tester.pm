@@ -525,7 +525,7 @@ sub Remove {
         return;
     }
 
-    my @mails = CGIArray('LIST');
+    my @mails = CGIArray('MAILS');
     return  unless @mails;
 
     $dbi->DoQuery('RemoveEmail',{mails => "'" . join("','",@mails) . "'"},$userid);
