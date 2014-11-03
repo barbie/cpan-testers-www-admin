@@ -8,6 +8,7 @@ Changes for the CPAN Testers Admin website
         - removed unused field validation for Testers.
         - renamed LIST field to MAILS due to validation conflict.
         - fixed Search by GUID logic.
+        - revised form field validation criteria.
 
 0.11    2014-09-20
         - fixed license fields in META.json to be lists.
