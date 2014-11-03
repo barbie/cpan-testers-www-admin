@@ -370,12 +370,15 @@ sub Tester  {
 
 sub Find  {
     return  unless RealmCheck('pause','admin');
+    $tvars{searched} = 1;
 
     my $cpan = Labyrinth::Plugin::CPAN->new();
-    my $dbx = $cpan->DBX('articles');
-    my @rows = $dbx->GetQuery('hash','FindReport',$cgiparams{nntp});
-    if(@rows)   { $tvars{report} = $rows[0]->{article}; }
-    else        { $tvars{report} = 'No report found for that ID'; }
+    my $dbx = $cpan->DBX('cpanstats');
+    my @rows = $dbx->GetQuery('hash','FindReport',$cgiparams{guid});
+    if(@rows) {
+        $tvars{data}{reports} = \@rows;
+        SetCommand('author-report');
+    }
 }
 
 sub Mark  {

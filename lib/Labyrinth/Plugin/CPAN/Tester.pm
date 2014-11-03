@@ -204,6 +204,7 @@ sub Reports  {
 
 sub Find  {
     return  unless RealmCheck('tester','admin');
+    $tvars{searched} = 1;
 
     my $cpan = Labyrinth::Plugin::CPAN->new();
     my $dbx = $cpan->DBX('cpanstats');
@@ -211,8 +212,6 @@ sub Find  {
     if(@rows) {
         $tvars{data}{reports} = \@rows;
         SetCommand('tester-report');
-    } else {
-        $tvars{errmess} = 'Sorry, report not found with that GUID. Please try again.';
     }
 }
 
