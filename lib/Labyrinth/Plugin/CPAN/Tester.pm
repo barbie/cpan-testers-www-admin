@@ -66,18 +66,9 @@ my %months = (
 # html: 0 = none, 1 = text, 2 = textarea
 
 my %fields = (
-    email       => { type => 1, html => 1 },
-    effect      => { type => 0, html => 1 },
-    userid      => { type => 0, html => 1 },
     nickname    => { type => 0, html => 1 },
     realname    => { type => 1, html => 1 },
-    aboutme     => { type => 0, html => 2 },
-    search      => { type => 0, html => 0 },
-    image       => { type => 0, html => 0 },
-    accessid    => { type => 0, html => 1 },
-    realmid     => { type => 0, html => 1 },
-    contact     => { type => 0, html => 1 },
-    testerid    => { type => 0, html => 1 },
+    email       => { type => 1, html => 1 },
 );
 
 my (@mandatory,@allfields);
