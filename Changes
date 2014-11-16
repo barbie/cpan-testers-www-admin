@@ -3,6 +3,7 @@ Changes for the CPAN Testers Admin website
 
         - phrasebook updates.
         - fixed missing use module in Author.pm.
+        - fixed prerequisites and module loading to be consistent.
 
 0.12    2014-11-12
         - documentation updates.

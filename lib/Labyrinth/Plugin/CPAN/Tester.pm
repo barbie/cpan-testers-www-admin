@@ -29,6 +29,7 @@ use Labyrinth::Variables;
 
 use Labyrinth::Plugin::CPAN;
 
+use Data::Dumper;
 use Digest::SHA qw(sha1_hex);
 use Time::Local;
 
@@ -148,7 +149,6 @@ sub Browse  {
         $dates{$y}{months}->{$m}{days}->{$d}{day} = int($d);
     }
 
-    use Data::Dumper;
     LogDebug(Dumper(\%dates));
 
     my @y;
