@@ -25,6 +25,8 @@ use Labyrinth::Session;
 use Labyrinth::Support;
 use Labyrinth::Variables;
 
+use Labyrinth::Plugin::CPAN;
+
 use Data::Dumper;
 use Sort::Versions;
 use Time::Local;
