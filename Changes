@@ -1,6 +1,8 @@
 Changes for the CPAN Testers Admin website
 ==========================================
 
+        - clean up of family links.
+
 0.13    2014-11-26
         - phrasebook updates.
         - fixed missing use module in Author.pm.
