@@ -5,6 +5,7 @@ Changes for the CPAN Testers Admin website
         - template fixes.
         - added tracking when author marks a report.
         - SQL improvements for listing dates and reports.
+        - upgrade to Labyrinth-Plugin-CPAN-3.53.
 
 0.14    2015-02-13
         - clean up of family links.
