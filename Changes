@@ -2,6 +2,7 @@ Changes for the CPAN Testers Admin website
 ==========================================
 
         - template fixes.
+        - added tracking when author marks a report.
 
 0.14    2015-02-13
         - clean up of family links.

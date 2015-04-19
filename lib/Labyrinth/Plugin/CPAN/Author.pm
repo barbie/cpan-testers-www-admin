@@ -402,6 +402,7 @@ sub Mark  {
         next    unless($tvars{hash}{dists}{$row->{dist}});
 
         my ($email,$name,$userid,$addressid) = $cpan->FindTester($row->{tester});
+        LogDebug("$author marks the report '$row->{id}' tested by '$row->{tester}', mapping to '$email' / '$name' / '$userid' / '$addressid'");
 
         # mark the report
         $dbi->DoQuery('MarkReport',$row->{id},$addressid,$email,$author,time());
