@@ -37,7 +37,7 @@ report ID to view more information about that report.</p>
   <td><input type="checkbox" name="DELETE" value="[% r.id %]" class="cb[% r.state | upper %]relunp" /></td>
 	<td class="[% r.state | upper %]"><a href="javascript:void(0);" onclick="more_info('[% r.guid %]','[% r.state | upper %]','[% r.dist %]','[% r.version %]','[% r.perl %]','[% r.osname %]','[% r.profile.display || r.tester | html %]','[% r.cpanid %]','[% r.fulldate %]');">[% r.state | upper %]</a></td>
 	<td>[% r.dist %]-[% r.version %]</td>
-	<td>[% r.cpanid %]</td>
+	<td>[% r.cpanid || r.author %]</td>
 	<td>[% r.perl %]</td>
 	<td>[% r.osname %]</td>
 	<td>[% r.profile.display || r.tester %]</td>

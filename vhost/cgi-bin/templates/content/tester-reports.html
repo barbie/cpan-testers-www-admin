@@ -3,7 +3,7 @@
     crumb2_name = 'Tester' ;
     crumb2_href = '/' ;
 
-    IF realm == 'admin' && !user.fakename ; THEN ; crumb2_name = 'Admin' ;
+    IF realm == 'admin' && !user.fakename ; THEN ; crumb2_name = 'Admin' ; END ;
 
     IF searched ; THEN ; 
       title = 'Find Reports by GUID' ;
