@@ -16,7 +16,7 @@ dist: trusty
 
 before_install:
   - cpanm -n Devel::Cover::Report::Coveralls
-  - sudo apt-get install imagemagick perlmagick libpng-dev libpng12-0
+  - brew install imagemagick perlmagick
 
 script:
   perl Makefile.PL && make && cover -test -report coveralls
